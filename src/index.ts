@@ -1,8 +1,9 @@
 import {Command, flags} from '@oclif/command'
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 
-const jsonExample = JSON.parse(readFileSync('./package.json', 'utf-8'));
-//console.log(jsonExample);
+const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8'));
+//console.log(jsonExample.dependencies);
+
 
 class JspmToNpmConvertor extends Command {
   static description = 'describe the command here'
@@ -20,43 +21,34 @@ class JspmToNpmConvertor extends Command {
   static args = [{name: 'file'}]
   async run() {
     const {args, flags} = this.parse(JspmToNpmConvertor)
-    const jsonEmpty: any = {"dependencies": {}};
    
-    for(let dep in jsonExample.jspm.dependencies){
-        const splitVersion = jsonExample.jspm.dependencies[dep].split('@');
-        let depName='';
+    for(let dep in packageJson.jspm.dependencies){ //for the dependencies in package.json
+        const splitVersion = packageJson.jspm.dependencies[dep].split('@');
+        
         const gitOrNpm = splitVersion[0].split(':')
-        if(gitOrNpm[0] == 'npm'){
-          depName = gitOrNpm[1];
-        }else{
-          depName = dep 
-        }
+        const depName = gitOrNpm[0] == 'npm' ? gitOrNpm[1] : dep;
+
         const depVersion = splitVersion[1]; 
-   
-        jsonEmpty.dependencies[depName] = depVersion;
+        packageJson.dependencies[depName] = depVersion;
     }
 ////////////////////////////////////////////////////////////////////////
-    if(flags.dev){
-      jsonEmpty["devDependencies"] = {};
-      for(let dep in jsonExample.jspm.devDependencies){
-        const splitVersion = jsonExample.jspm.devDependencies[dep].split('@');
+
+    if(flags.dev){ //for the devDependencies in package.json if -d was used
+      for(let dep in packageJson.jspm.devDependencies){
+        const splitVersion = packageJson.jspm.devDependencies[dep].split('@');
           
-        let depName='';
-        const gitOrNpm = splitVersion[0].split(':');
+        const gitOrNpm = splitVersion[0].split(':')
+        const depName = gitOrNpm[0] == 'npm' ? gitOrNpm[1] : dep;
         
-        if(gitOrNpm[0] == 'npm'){
-          depName = gitOrNpm[1];
-        }else{
-          depName = dep 
-        }
         const depVersion = splitVersion[1]; 
-   
-        jsonEmpty.devDependencies[depName] = depVersion;
+        packageJson.devDependencies[depName] = depVersion;
       }
     }
-   
-    console.log(jsonEmpty);
-  }
-
+    delete packageJson.jspm;
+    writeFileSync('./package-snyk.json', JSON.stringify(packageJson, null, 2));
+  }  
 }
+//delete packageJson.jspm;
+//console.log(packageJson);
+//writeFileSync('./package-snyk.json', packageJson.toString());
 export = JspmToNpmConvertor
