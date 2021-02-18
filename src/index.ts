@@ -1,9 +1,19 @@
 import {Command, flags} from '@oclif/command'
 import { readFileSync, writeFileSync } from 'fs';
 
-const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8'));
-//console.log(jsonExample.dependencies);
 
+
+const depExtractor = (file: any, depOrDevDep: string)=>{
+  for(let dep in file.jspm[depOrDevDep]){ // going over devDep or dep in jspm
+    const splitVrsnName = file.jspm[depOrDevDep][dep].split('@');
+    
+    const gitOrNpm = splitVrsnName[0].split(':')
+    const depName = gitOrNpm[0] == 'npm' ? gitOrNpm[1] : dep;
+
+    const depVersion = splitVrsnName[1]; 
+    file[depOrDevDep][depName] = depVersion; //inserting dependency 
+}
+}
 
 class JspmToNpmConvertor extends Command {
   static description = 'describe the command here'
@@ -12,43 +22,29 @@ class JspmToNpmConvertor extends Command {
     version: flags.version({char: 'v'}),
     help: flags.help({char: 'h'}),
     // flag with a value (-n, --name=VALUE)
-    name: flags.string({char: 'n', description: 'name to print'}),
+    name: flags.string({char: 'n', description: 'name of output file', required: true}),
+    // flag with a value (-i, --input=VALUE)
+    input: flags.string({char: 'i', description: 'name of input file', required: true}),
     // flag with no value (-f, --force)
     force: flags.boolean({char: 'f'}),
     // flag with no value (-d, --dev)
-    dev: flags.boolean({char: 'd'}),
+    dev: flags.boolean({char: 'd', description: 'devDependencies be imported as well'}),
   }
+  
   static args = [{name: 'file'}]
-  async run() {
-    const {args, flags} = this.parse(JspmToNpmConvertor)
-   
-    for(let dep in packageJson.jspm.dependencies){ //for the dependencies in package.json
-        const splitVersion = packageJson.jspm.dependencies[dep].split('@');
-        
-        const gitOrNpm = splitVersion[0].split(':')
-        const depName = gitOrNpm[0] == 'npm' ? gitOrNpm[1] : dep;
 
-        const depVersion = splitVersion[1]; 
-        packageJson.dependencies[depName] = depVersion;
-    }
-////////////////////////////////////////////////////////////////////////
+  async run() {
+    
+    const {args, flags} = this.parse(JspmToNpmConvertor)
+    const packageJson = JSON.parse(readFileSync('./'+flags.input, 'utf-8'));
+    depExtractor(packageJson, "dependencies");
 
     if(flags.dev){ //for the devDependencies in package.json if -d was used
-      for(let dep in packageJson.jspm.devDependencies){
-        const splitVersion = packageJson.jspm.devDependencies[dep].split('@');
-          
-        const gitOrNpm = splitVersion[0].split(':')
-        const depName = gitOrNpm[0] == 'npm' ? gitOrNpm[1] : dep;
-        
-        const depVersion = splitVersion[1]; 
-        packageJson.devDependencies[depName] = depVersion;
-      }
+      depExtractor(packageJson, "devDependencies");
     }
+
     delete packageJson.jspm;
-    writeFileSync('./package-snyk.json', JSON.stringify(packageJson, null, 2));
+    writeFileSync('./'+flags.name, JSON.stringify(packageJson, null, 2));
   }  
 }
-//delete packageJson.jspm;
-//console.log(packageJson);
-//writeFileSync('./package-snyk.json', packageJson.toString());
 export = JspmToNpmConvertor
