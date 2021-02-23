@@ -1,20 +1,19 @@
 {
-  "name": "jspm-to-npm-convertor",
+  "name": "jspm-to-npm-snyk-convertor",
   "description": "Extract the list of dependencies from the JSPM section of the package.json to the regular section",
   "version": "0.0.0",
   "author": "Philippe Stemberger @Snyk",
   "bin": {
-    "jspm-to-npm-convertor": "./bin/run"
+    "jspm-to-npm-convertor": "bin/run"
   },
   "bugs": "https://github.com/pstember/jspm-to-npm-convertor/issues",
   "dependencies": {
     "@oclif/command": "^1",
     "@oclif/config": "^1",
+    "@oclif/plugin-autocomplete": "^0.3.0",
     "@oclif/plugin-help": "^3",
     "tslib": "^1"
   },
-
-
   "devDependencies": {
     "@oclif/dev-cli": "^1",
     "@types/node": "^10",
@@ -38,7 +37,10 @@
   "license": "MIT",
   "main": "lib/index.js",
   "oclif": {
-    "bin": "jspm-to-npm-convertor"
+    "bin": "jspm-to-npm-convertor",
+    "macos":{
+      "identifier":"jspm-to-npm-convertor"
+    }
   },
   "repository": "pstember/jspm-to-npm-convertor",
   "scripts": {

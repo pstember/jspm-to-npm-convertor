@@ -15,11 +15,11 @@ Extract the list of dependencies from the JSPM section of the package.json to th
 # Usage
 <!-- usage -->
 ```sh-session
-$ npm install -g jspm-to-npm-convertor
+$ npm install -g jspm-to-npm-snyk-convertor
 $ jspm-to-npm-convertor COMMAND
 running command...
 $ jspm-to-npm-convertor (-v|--version|version)
-jspm-to-npm-convertor/0.0.0 darwin-x64 node-v15.3.0
+jspm-to-npm-snyk-convertor/0.0.0 darwin-x64 node-v15.3.0
 $ jspm-to-npm-convertor --help [COMMAND]
 USAGE
   $ jspm-to-npm-convertor COMMAND
@@ -30,3 +30,17 @@ USAGE
 <!-- commands -->
 
 <!-- commandsstop -->
+```This tool is deisgned to extract the dependencies from the JSPM section to the regular section of the package.json
+
+USAGE
+  $ jspm-to-npm-convertor
+  $ jspm-to-npm-convertor -i ./package-jspm.json -o ./snyk/package.json -g
+
+OPTIONS
+  -d, --dev            devDependencies to be imported as well
+  -g, --ignoreGithub   ignore github registry based dependencies
+  -h, --help           show CLI help
+  -i, --input=input    [default: package.json] name of input file
+  -o, --output=output  [default: ./snyk/package.json] name of output file
+  -v, --version        show CLI version
+```
