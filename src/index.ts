@@ -12,7 +12,7 @@ const depExtractor = (file: any, depOrDevDep: string)=>{
 
     const depVersion = splitVrsnName[1]; 
     file[depOrDevDep][depName] = depVersion; //inserting dependency 
-}
+  }
 }
 
 class JspmToNpmConvertor extends Command {
@@ -22,13 +22,13 @@ class JspmToNpmConvertor extends Command {
     version: flags.version({char: 'v'}),
     help: flags.help({char: 'h'}),
     // flag with a value (-n, --name=VALUE)
-    name: flags.string({char: 'n', description: 'name of output file', required: true}),
+    name: flags.string({char: 'n', description: 'name of output file', default: "package.json"}),
     // flag with a value (-i, --input=VALUE)
-    input: flags.string({char: 'i', description: 'name of input file', required: true}),
+    input: flags.string({char: 'i', description: 'name of input file', default: "package_snyk.json"}),
     // flag with no value (-f, --force)
     force: flags.boolean({char: 'f'}),
     // flag with no value (-d, --dev)
-    dev: flags.boolean({char: 'd', description: 'devDependencies be imported as well'}),
+    dev: flags.boolean({char: 'd', description: 'devDependencies to be imported as well'}),
   }
   
   static args = [{name: 'file'}]
